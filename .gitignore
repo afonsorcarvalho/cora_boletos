@@ -1,0 +1,59 @@
+# Arquivos de configuração com dados sensíveis
+config.yaml
+.env
+
+# Certificados e chaves
+*.pem
+*.key
+*.crt
+*.cer
+certificados/
+
+# Ambiente virtual Python
+.venv/
+venv/
+ENV/
+
+# Arquivos de cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos de distribuição / packaging
+dist/
+build/
+*.egg-info/
+
+# Arquivos de teste e cobertura
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+coverage.xml
+*.cover
+
+# Logs
+*.log
+logs/
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Arquivos temporários do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de dados e exemplos gerados
+*.xlsx
+*.csv
+!examples/*.xlsx
+!examples/*.csv
+
+# Arquivos de backup
+*.bak
+*.tmp
+*.temp 

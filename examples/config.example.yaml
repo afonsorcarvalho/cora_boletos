@@ -1,0 +1,44 @@
+# Configurações da API da Cora
+api:
+  # URL base da API
+  url: https://api.stage.cora.com.br/v2/invoices/installments
+  
+  # URL de autenticação
+  auth_url: https://matls-clients.api.stage.cora.com.br/token
+  
+  # Credenciais
+  client_id: seu_client_id
+  
+  # Caminhos dos certificados
+  cert_path: certificados/certificate.pem
+  key_path: certificados/private-key.key
+
+# Configurações de notificação
+notifications:
+  # Regras de notificação por email
+  email:
+    - before_due_date_5_days
+    - before_due_date_2_days
+    - on_due_date
+    - on_payment
+  
+  # Regras de notificação por SMS
+  sms:
+    - before_due_date_2_days
+    - on_due_date
+
+# Configurações padrão de pagamento
+payment:
+  # Juros padrão (% ao mês)
+  interest: 1.0
+  
+  # Multa padrão (em centavos)
+  fine: 500
+  
+  # Formas de pagamento habilitadas
+  forms:
+    - BANK_SLIP
+    - PIX
+
+# Configurações de debug
+debug: false 
