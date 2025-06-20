@@ -65,7 +65,7 @@ class TestGeradorBoletos(unittest.TestCase):
             'codigo': '12345',
             'nome': 'João da Silva',
             'email': 'joao@email.com',
-            'documento': '123.456.789-10',
+            'documento': '123.456.789-09',  # CPF válido
             'servico_nome': 'Consultoria',
             'servico_descricao': 'Consultoria mensal',
             'valor': 100.50,
@@ -81,7 +81,7 @@ class TestGeradorBoletos(unittest.TestCase):
         self.assertEqual(payload['code'], '12345')
         self.assertEqual(payload['customer']['name'], 'João da Silva')
         self.assertEqual(payload['customer']['email'], 'joao@email.com')
-        self.assertEqual(payload['customer']['document']['identity'], '12345678910')
+        self.assertEqual(payload['customer']['document']['identity'], '12345678909')
         self.assertEqual(payload['customer']['document']['type'], 'CPF')
         
         # Verifica o serviço
@@ -93,7 +93,7 @@ class TestGeradorBoletos(unittest.TestCase):
         # Verifica os termos de pagamento (valores padrão)
         self.assertEqual(payload['payment_terms']['due_date'], self.data_vencimento)
         self.assertEqual(payload['payment_terms']['fine']['amount'], 500)  # R$ 5,00 em centavos
-        self.assertEqual(payload['payment_terms']['interest_monthly_percent'], 1.0)  # 1% ao mês
+        self.assertEqual(payload['payment_terms']['interest']['rate'], 1.0)  # 1% ao mês
 
         # Verifica as notificações
         self.assertEqual(len(payload['notification']['channels']), 2)  # Email + SMS
@@ -105,7 +105,7 @@ class TestGeradorBoletos(unittest.TestCase):
             'codigo': '12345',
             'nome': 'João da Silva',
             'email': 'joao@email.com',
-            'documento': '123.456.789-10',
+            'documento': '123.456.789-09',  # CPF válido
             'servico_nome': 'Consultoria',
             'servico_descricao': 'Consultoria mensal',
             'valor': 100.50,
@@ -123,7 +123,7 @@ class TestGeradorBoletos(unittest.TestCase):
         self.assertEqual(payload['code'], '12345')
         self.assertEqual(payload['customer']['name'], 'João da Silva')
         self.assertEqual(payload['customer']['email'], 'joao@email.com')
-        self.assertEqual(payload['customer']['document']['identity'], '12345678910')
+        self.assertEqual(payload['customer']['document']['identity'], '12345678909')
         self.assertEqual(payload['customer']['document']['type'], 'CPF')
         
         # Verifica o serviço
@@ -135,7 +135,7 @@ class TestGeradorBoletos(unittest.TestCase):
         # Verifica os termos de pagamento (valores personalizados)
         self.assertEqual(payload['payment_terms']['due_date'], self.data_vencimento)
         self.assertEqual(payload['payment_terms']['fine']['amount'], 1000)  # R$ 10,00 em centavos
-        self.assertEqual(payload['payment_terms']['interest_monthly_percent'], 2.5)  # 2.5% ao mês
+        self.assertEqual(payload['payment_terms']['interest']['rate'], 2.5)  # 2.5% ao mês
 
         # Verifica as notificações
         self.assertEqual(len(payload['notification']['channels']), 2)  # Email + SMS
@@ -156,7 +156,7 @@ class TestGeradorBoletos(unittest.TestCase):
                     'codigo': '12345',
                     'nome': 'João da Silva',
                     'email': 'joao@email.com',
-                    'documento': '123.456.789-10',
+                    'documento': '123.456.789-09',  # CPF válido
                     'servico_nome': 'Consultoria',
                     'servico_descricao': 'Consultoria mensal',
                     'valor': 100.50,
@@ -188,7 +188,7 @@ class TestGeradorBoletos(unittest.TestCase):
             'codigo': 'EMP001',
             'nome': 'Empresa ABC Ltda',
             'email': 'contato@empresa.com',
-            'documento': '12.345.678/0001-90',
+            'documento': '11.222.333/0001-81',  # CNPJ válido
             'servico_nome': 'Serviço Empresarial',
             'servico_descricao': 'Pacote empresarial mensal',
             'valor': 1500.00,
@@ -210,7 +210,7 @@ class TestGeradorBoletos(unittest.TestCase):
         self.assertEqual(payload['code'], 'EMP001')
         self.assertEqual(payload['customer']['name'], 'Empresa ABC Ltda')
         self.assertEqual(payload['customer']['email'], 'contato@empresa.com')
-        self.assertEqual(payload['customer']['document']['identity'], '12345678000190')
+        self.assertEqual(payload['customer']['document']['identity'], '11222333000181')
         self.assertEqual(payload['customer']['document']['type'], 'CNPJ')
 
         # Verifica o endereço
@@ -235,7 +235,7 @@ class TestGeradorBoletos(unittest.TestCase):
             'codigo': '12345',
             'nome': 'João da Silva',
             'email': 'joao@email.com',
-            'documento': '123.456.789-10',
+            'documento': '123.456.789-09',  # CPF válido
             'servico_nome': 'Consultoria',
             'servico_descricao': 'Consultoria mensal',
             'valor': 'R$ 1.234,56',
@@ -255,7 +255,7 @@ class TestGeradorBoletos(unittest.TestCase):
             'codigo': '12345',
             'nome': 'João da Silva',
             'email': 'joao@email.com',
-            'documento': '123.456.789-10',
+            'documento': '123.456.789-09',  # CPF válido
             'servico_nome': 'Consultoria',
             'servico_descricao': 'Consultoria mensal',
             'valor': 100.00,

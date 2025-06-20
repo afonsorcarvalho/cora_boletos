@@ -41,4 +41,4 @@ payment:
     - PIX
 
 # Configurações de debug
-debug: false 
+debug: true 

@@ -28,12 +28,12 @@ def criar_dados_boleto() -> List[Dict[str, Any]]:
             "codigo": "BOL001",
             "nome": "João da Silva",
             "email": "joao@email.com",
-            "documento": "123.456.789-10",
+            "documento": "356.490.490-50",
             "telefone": "(11) 98765-4321",
             "servico_nome": "Consultoria",
             "servico_descricao": "Consultoria mensal - Janeiro 2024",
             "valor": 1500.50,
-            "data_vencimento": datetime.now() + timedelta(days=10),
+            "data_vencimento": (datetime.now() + timedelta(days=10)).strftime('%Y-%m-%d'),
             "juros_mensal": 2.5,  # 2.5% ao mês
             "multa": 10.00,  # R$ 10,00 de multa
         },
@@ -46,7 +46,7 @@ def criar_dados_boleto() -> List[Dict[str, Any]]:
             "servico_nome": "Desenvolvimento",
             "servico_descricao": "Desenvolvimento de sistema - Fase 1",
             "valor": 5000.00,
-            "data_vencimento": datetime.now() + timedelta(days=15),
+            "data_vencimento": (datetime.now() + timedelta(days=15)).strftime('%Y-%m-%d'),
             "juros_mensal": 1.0,  # 1% ao mês
             "multa": 50.00,  # R$ 50,00 de multa
         }
@@ -67,28 +67,51 @@ def carregar_config() -> Dict[str, Any]:
         sys.exit(1)
         
     with open(config_path, 'r') as f:
-        return yaml.safe_load(f)
+        config = yaml.safe_load(f)
+    
+    # Verifica se os certificados existem
+    cert_path = config.get('certificates', {}).get('cert_path')
+    key_path = config.get('certificates', {}).get('key_path')
+    
+    if cert_path and not os.path.exists(cert_path):
+        print(f"Aviso: Certificado não encontrado: {cert_path}")
+        print("Crie o diretório 'certificados' e adicione os arquivos de certificado")
+        
+    if key_path and not os.path.exists(key_path):
+        print(f"Aviso: Chave privada não encontrada: {key_path}")
+        print("Crie o diretório 'certificados' e adicione os arquivos de certificado")
+    
+    return config
 
 def main():
     """Função principal que demonstra o uso do gerador de boletos."""
     # Carrega configurações
     config = carregar_config()
     
-    # Obtém configurações da API
+    # Obtém configurações da API usando a estrutura correta do config.yaml
     api_config = config.get('api', {})
-    client_id = api_config.get('client_id')
-    cert_path = api_config.get('cert_path')
-    key_path = api_config.get('key_path')
-    api_url = api_config.get('url')
+    credentials = config.get('credentials', {})
+    certificates = config.get('certificates', {})
+    
+    client_id = credentials.get('client_id')
+    cert_path = certificates.get('cert_path')
+    key_path = certificates.get('key_path')
+    api_url = api_config.get('base_url')
+    auth_url = api_config.get('auth_url')
     
     if not all([client_id, cert_path, key_path, api_url]):
         print("Erro: Configurações da API incompletas no config.yaml")
-        print("Verifique se client_id, cert_path, key_path e url estão configurados")
+        print("Verifique se as seguintes configurações estão presentes:")
+        print("- credentials.client_id")
+        print("- certificates.cert_path")
+        print("- certificates.key_path")
+        print("- api.base_url")
         sys.exit(1)
     
     try:
         # Inicializa autenticação
         auth = CoraAuth(
+            auth_url=auth_url,
             client_id=client_id,
             cert_path=cert_path,
             key_path=key_path,
@@ -113,11 +136,8 @@ def main():
             try:
                 # Cria o payload e envia para a API
                 response = gerador.gerar_boleto_individual(dados)
+                print(response)
                 
-                print(f"Boleto gerado com sucesso!")
-                print(f"Código de barras: {response.get('barcode', 'N/A')}")
-                print(f"Link do boleto: {response.get('invoice_url', 'N/A')}")
-                print(f"Link do QR Code PIX: {response.get('pix_url', 'N/A')}")
                 
             except Exception as e:
                 print(f"Erro ao gerar boleto: {str(e)}")
