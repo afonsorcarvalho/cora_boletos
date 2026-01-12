@@ -1,6 +1,7 @@
 # Arquivos de configuração com dados sensíveis
 config.yaml
 .env
+# .env.example deve ser versionado (não está aqui)
 
 # Certificados e chaves
 *.pem

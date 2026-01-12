@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Boletos - {{ dados.cpf }} - Consulta de Boletos Cora{% endblock %}
+
+{% block extra_css %}
+<style>
+    .boleto-card {
+        border: 2px solid #f0f0f0;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 16px;
+        background: white;
+        transition: all 0.3s ease;
+    }
+    
+    .boleto-card:hover {
+        border-color: #E0367E;
+        box-shadow: 0 4px 16px rgba(224, 54, 126, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .boleto-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .boleto-info {
+        flex: 1;
+    }
+    
+    .boleto-cliente {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+    
+    .boleto-descricao {
+        color: #666;
+        font-size: 0.95em;
+        margin-bottom: 10px;
+    }
+    
+    .boleto-dados {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .boleto-dado-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .boleto-dado-label {
+        font-size: 0.875em;
+        color: #666666;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    
+    .boleto-dado-valor {
+        font-size: 1.1em;
+        color: #333333;
+        font-weight: 600;
+    }
+    
+    .payment-actions {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #f0f0f0;
+    }
+    
+    .qr-code-container {
+        text-align: center;
+        margin: 15px 0;
+    }
+    
+    .qr-code-img {
+        max-width: 200px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px;
+        background: white;
+    }
+    
+    .barcode-container {
+        margin: 15px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .barcode-text {
+        font-family: 'Courier New', monospace;
+        font-size: 1.1em;
+        word-break: break-all;
+        text-align: center;
+        color: #333;
+        font-weight: 600;
+        letter-spacing: 2px;
+    }
+    
+    .btn-pdf {
+        background: #E0367E;
+        color: white;
+    }
+    
+    .btn-pdf:hover {
+        background: #c72d6a;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h2 style="color: #E0367E; margin-bottom: 5px; font-weight: 700;">Boletos - {{ dados.cpf }}</h2>
+            {% if dados.total_original > 12 %}
+            <p style="color: #666666; font-size: 0.9em; margin: 0;">
+                Mostrando os últimos 12 de {{ dados.total_original }} boletos encontrados
+            </p>
+            {% else %}
+            <p style="color: #666666; font-size: 0.9em; margin: 0;">
+                {{ dados.total }} boleto{{ 's' if dados.total != 1 else '' }} encontrado{{ 's' if dados.total != 1 else '' }}
+            </p>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">← Buscar Outro CPF/CNPJ</a>
+    </div>
+    
+    {% if dados.boletos %}
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            {% for boleto in dados.boletos %}
+            <div class="boleto-card" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" 
+                 onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'"
+                 onclick="showLoadingModal(); window.location.href='{{ url_for('visualizar', invoice_id=boleto.id) }}'">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+                    <div style="flex: 1;">
+                        <div class="boleto-dado-item" style="margin-bottom: 10px;">
+                            <span class="boleto-dado-label">Data de Vencimento</span>
+                            <span class="boleto-dado-valor" style="font-size: 1.1em;">
+                                {% if boleto.due_date %}
+                                    {{ boleto.due_date[:10] if boleto.due_date|length > 10 else boleto.due_date }}
+                                {% else %}
+                                    Não informada
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div style="flex-shrink: 0;">
+                        <span class="status-badge status-{{ boleto.status.lower() if boleto.status else 'pending' }}">
+                            {% if boleto.esta_pago %}
+                                ✅ PAGO
+                            {% else %}
+                                {% if boleto.status == 'PENDING' %}
+                                    ⏳ PENDENTE
+                                {% elif boleto.status == 'LATE' %}
+                                    ⚠️ VENCIDO
+                                {% elif boleto.status == 'CANCELLED' %}
+                                    ❌ CANCELADO
+                                {% else %}
+                                    📋 {{ boleto.status or 'PENDENTE' }}
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="info-box" style="text-align: center; padding: 40px;">
+            <h3 style="margin-bottom: 15px; color: #666;">Nenhum boleto encontrado</h3>
+            <p style="color: #999; margin-bottom: 20px;">
+                Não foram encontrados boletos para o CPF/CNPJ: <strong>{{ dados.cpf }}</strong>
+            </p>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Buscar Novamente</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Loading para Detalhes -->
+<div id="modal-loading-detalhes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div style="background: white; padding: 48px; border-radius: 16px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.12); max-width: 400px; width: 90%;">
+        <div style="font-size: 56px; margin-bottom: 24px; animation: pulse 1.5s ease-in-out infinite;">⏳</div>
+        <h3 style="color: #E0367E; margin-bottom: 12px; font-size: 1.5em; font-weight: 700;">Carregando detalhes...</h3>
+        <p style="color: #666666; margin: 0; font-size: 1em;">Aguarde enquanto carregamos as informações do boleto</p>
+    </div>
+</div>
+
+<style>
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+</style>
+
+<script>
+function showLoadingModal() {
+    const modal = document.getElementById('modal-loading-detalhes');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+</script>
+{% endblock %}

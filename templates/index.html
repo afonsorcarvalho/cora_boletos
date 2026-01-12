@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar Boletos - Consulta de Boletos Cora{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 20px; color: #E0367E; font-weight: 700;">Buscar Boletos</h2>
+    <p style="margin-bottom: 30px; color: #666666;">
+        Digite seu CPF ou CNPJ para consultar seus boletos, visualizar detalhes e verificar o status de pagamento.
+    </p>
+    
+    <form method="POST" action="{{ url_for('buscar') }}" id="form-buscar">
+        <div class="form-group">
+            <label for="cpf">CPF ou CNPJ:</label>
+            <input 
+                type="text" 
+                id="cpf" 
+                name="cpf" 
+                placeholder="Ex: 123.456.789-00 ou 12.345.678/0001-90" 
+                required
+                autofocus
+                maxlength="18"
+            >
+        </div>
+        
+        <button type="submit" class="btn">🔍 Buscar Boletos</button>
+    </form>
+    
+    <div class="info-box" style="margin-top: 30px;">
+        <h3>ℹ️ Informações</h3>
+        <p>Digite seu CPF (11 dígitos) ou CNPJ (14 dígitos) para buscar todos os seus boletos.</p>
+        <p style="margin-top: 10px;">Você pode digitar com ou sem formatação (pontos, traços, barras).</p>
+        <p style="margin-top: 10px;"><strong>Exemplos:</strong></p>
+        <ul style="margin-top: 5px; padding-left: 20px;">
+            <li>123.456.789-00</li>
+            <li>12345678900</li>
+            <li>12.345.678/0001-90</li>
+            <li>12345678000190</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Modal de Loading -->
+<div id="modal-loading" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div style="background: white; padding: 48px; border-radius: 16px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.12); max-width: 400px; width: 90%;">
+        <div style="font-size: 56px; margin-bottom: 24px; animation: pulse 1.5s ease-in-out infinite;">⏳</div>
+        <h3 style="color: #E0367E; margin-bottom: 12px; font-size: 1.5em; font-weight: 700;">Buscando boletos...</h3>
+        <p style="color: #666666; margin: 0; font-size: 1em;">Aguarde enquanto buscamos os boletos</p>
+    </div>
+</div>
+
+<style>
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+</style>
+
+<script>
+// Funções de validação de CPF/CNPJ
+function validarCPF(cpf) {
+    cpf = cpf.replace(/[^\d]/g, '');
+    
+    if (cpf.length !== 11 || cpf === cpf[0].repeat(11)) {
+        return false;
+    }
+    
+    let soma = 0;
+    for (let i = 0; i < 9; i++) {
+        soma += parseInt(cpf.charAt(i)) * (10 - i);
+    }
+    let resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.charAt(9))) return false;
+    
+    soma = 0;
+    for (let i = 0; i < 10; i++) {
+        soma += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.charAt(10))) return false;
+    
+    return true;
+}
+
+function validarCNPJ(cnpj) {
+    cnpj = cnpj.replace(/[^\d]/g, '');
+    
+    if (cnpj.length !== 14 || cnpj === cnpj[0].repeat(14)) {
+        return false;
+    }
+    
+    let tamanho = cnpj.length - 2;
+    let numeros = cnpj.substring(0, tamanho);
+    let digitos = cnpj.substring(tamanho);
+    let soma = 0;
+    let pos = tamanho - 7;
+    
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+    }
+    
+    let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado !== parseInt(digitos.charAt(0))) return false;
+    
+    tamanho = tamanho + 1;
+    numeros = cnpj.substring(0, tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+    
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+    }
+    
+    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado !== parseInt(digitos.charAt(1))) return false;
+    
+    return true;
+}
+
+function validarDocumento(documento) {
+    const documentoLimpo = documento.replace(/[^\d]/g, '');
+    
+    if (documentoLimpo.length === 11) {
+        return validarCPF(documento) ? '' : 'CPF inválido. Verifique os dígitos.';
+    } else if (documentoLimpo.length === 14) {
+        return validarCNPJ(documento) ? '' : 'CNPJ inválido. Verifique os dígitos.';
+    } else {
+        return 'Documento inválido. CPF deve ter 11 dígitos e CNPJ deve ter 14 dígitos.';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('form-buscar');
+    const modal = document.getElementById('modal-loading');
+    const inputCpf = document.getElementById('cpf');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const cpfValue = inputCpf.value.trim();
+            
+            if (!cpfValue) {
+                e.preventDefault();
+                alert('Por favor, informe o CPF ou CNPJ');
+                return false;
+            }
+            
+            const erroValidacao = validarDocumento(cpfValue);
+            if (erroValidacao) {
+                e.preventDefault();
+                alert(erroValidacao);
+                inputCpf.focus();
+                return false;
+            }
+            
+            modal.style.display = 'flex';
+        });
+    }
+});
+</script>
+{% endblock %}

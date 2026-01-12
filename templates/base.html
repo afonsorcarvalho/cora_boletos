@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Consulta de Boletos - Cora{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(to bottom, #ffffff 0%, #fef7f7 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: #E0367E;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #E0367E;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            color: #666666;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            margin-bottom: 20px;
+        }
+        
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .flash-message.error {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        
+        .flash-message.success {
+            background-color: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: #E0367E;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .btn:hover {
+            background: #c72d6a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(224, 54, 126, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #E0367E;
+            border: 2px solid #E0367E;
+        }
+        
+        .btn-secondary:hover {
+            background: #E0367E;
+            color: white;
+            box-shadow: 0 4px 12px rgba(224, 54, 126, 0.3);
+        }
+        
+        .btn-pdf {
+            background: #E0367E;
+            color: white;
+        }
+        
+        .btn-pdf:hover {
+            background: #c72d6a;
+            box-shadow: 0 4px 12px rgba(224, 54, 126, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333333;
+            font-size: 0.95em;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #E0367E;
+            box-shadow: 0 0 0 3px rgba(224, 54, 126, 0.1);
+        }
+        
+        .info-box {
+            background: #fafafa;
+            border-left: 4px solid #E0367E;
+            padding: 24px;
+            margin: 20px 0;
+            border-radius: 12px;
+        }
+        
+        .info-box h3 {
+            margin-bottom: 12px;
+            color: #333333;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875em;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-paid {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-late {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-cancelled {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="margin-bottom: 25px; display: flex; justify-content: center;">
+                <img src="/static/afr_logo.svg" alt="AFR Logo" style="max-width: 300px; height: auto;" onerror="this.style.display='none'">
+            </div>
+            <h1>📊 Consulta de Boletos</h1>
+            <p>Sistema de consulta de boletos</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

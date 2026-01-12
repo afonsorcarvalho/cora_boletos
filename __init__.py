@@ -10,8 +10,8 @@ __author__ = "Afonso Carvalho"
 __email__ = "afonso@email.com"
 __license__ = "MIT"
 
-from .auth import CoraAuth
-from .gerador import GeradorBoletos
+from libs.auth import CoraAuth
+from libs.gerador import GeradorBoletos
 
 __all__ = [
     "CoraAuth",

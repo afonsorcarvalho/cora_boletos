@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Boleto {{ boleto.code }} - Consulta de Boletos Cora{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2 style="color: #E0367E; font-weight: 700;">Detalhes do Boleto</h2>
+        <a href="javascript:history.back()" class="btn btn-secondary">← Voltar</a>
+    </div>
+    
+    <!-- Status do Pagamento -->
+    <div style="margin-bottom: 30px; padding: 24px; background: {% if boleto.esta_pago %}#f0fdf4{% else %}#fef3c7{% endif %}; border-radius: 16px; border-left: 4px solid {% if boleto.esta_pago %}#16a34a{% else %}#f59e0b{% endif %};">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span class="status-badge status-{{ boleto.status.lower() if boleto.status else 'pending' }}">
+                {% if boleto.esta_pago %}
+                    ✅ PAGO
+                {% else %}
+                    {% if boleto.status == 'PENDING' %}
+                        ⏳ PENDENTE
+                    {% elif boleto.status == 'LATE' %}
+                        ⚠️ VENCIDO
+                    {% elif boleto.status == 'CANCELLED' %}
+                        ❌ CANCELADO
+                    {% else %}
+                        📋 {{ boleto.status }}
+                    {% endif %}
+                {% endif %}
+            </span>
+            <span style="color: #666; font-size: 1.1em;">
+                {% if boleto.esta_pago %}
+                    Este boleto foi pago.
+                {% else %}
+                    Este boleto ainda não foi pago.
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    
+    <!-- Dados do Cliente -->
+    {% if boleto.customer %}
+    <div style="margin-bottom: 30px;">
+        <h3 style="color: #E0367E; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; font-weight: 700;">👤 Dados do Cliente</h3>
+        <div class="info-box">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                {% if boleto.customer.get('name') %}
+                <div>
+                    <strong style="color: #666; font-size: 0.9em;">Nome:</strong>
+                    <p style="margin-top: 5px; font-size: 1.1em; color: #333; word-break: break-word;">{{ boleto.customer.name }}</p>
+                </div>
+                {% endif %}
+                {% if boleto.customer.get('document') %}
+                    {% if boleto.customer.document is mapping %}
+                        {% if boleto.customer.document.get('identity') %}
+                        <div>
+                            <strong style="color: #666; font-size: 0.9em;">CPF/CNPJ:</strong>
+                            <p style="margin-top: 5px; font-size: 1.1em; color: #333;">{{ boleto.customer.document.identity }}</p>
+                        </div>
+                        {% endif %}
+                        {% if boleto.customer.document.get('type') %}
+                        <div>
+                            <strong style="color: #666; font-size: 0.9em;">Tipo:</strong>
+                            <p style="margin-top: 5px; font-size: 1.1em; color: #333;">{{ boleto.customer.document.type }}</p>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                    <div>
+                        <strong style="color: #666; font-size: 0.9em;">CPF/CNPJ:</strong>
+                        <p style="margin-top: 5px; font-size: 1.1em; color: #333;">{{ boleto.customer.document }}</p>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                {% if boleto.customer.get('email') %}
+                <div>
+                    <strong style="color: #666; font-size: 0.9em;">Email:</strong>
+                    <p style="margin-top: 5px; font-size: 1.1em; color: #333;">{{ boleto.customer.email }}</p>
+                </div>
+                {% endif %}
+                {% if boleto.customer.get('address') %}
+                    {% set addr = boleto.customer.address %}
+                    <div style="grid-column: 1 / -1;">
+                        <strong style="color: #666; font-size: 0.9em;">Endereço:</strong>
+                        <p style="margin-top: 5px; font-size: 1.1em; color: #333;">
+                            {% if addr.get('street') %}{{ addr.street }}{% endif %}{% if addr.get('number') %}, {{ addr.number }}{% endif %}
+                            {% if addr.get('complement') %}, {{ addr.complement }}{% endif %}<br>
+                            {% if addr.get('district') %}{{ addr.district }}{% endif %}{% if addr.get('city') %}, {{ addr.city }}{% endif %}{% if addr.get('state') %} - {{ addr.state }}{% endif %}
+                            {% if addr.get('zip_code') %}<br>CEP: {{ addr.zip_code }}{% endif %}
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Informações do Boleto -->
+    <div style="margin-bottom: 30px;">
+        <h3 style="color: #E0367E; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; font-weight: 700;">📋 Informações do Boleto</h3>
+        <div class="info-box">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                {% if boleto.due_date %}
+                <div style="padding: 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; border: 2px solid #f59e0b; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            <strong style="color: #92400e; font-size: 0.95em; display: block; margin-bottom: 8px; font-weight: 600;">Data de Vencimento</strong>
+                            <p style="font-size: 1.5em; color: #78350f; font-weight: 700; margin: 0;">{{ boleto.due_date[:10] if boleto.due_date|length > 10 else boleto.due_date }}</p>
+                        </div>
+                        <div style="font-size: 2.5em;">📅</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    {% if boleto.id %}
+                    <div>
+                        <strong style="color: #666; font-size: 0.9em; display: block; margin-bottom: 6px;">ID:</strong>
+                        <p style="font-size: 1em; color: #333; word-break: break-all;">{{ boleto.id }}</p>
+                    </div>
+                    {% endif %}
+                    {% if boleto.code %}
+                    <div>
+                        <strong style="color: #666; font-size: 0.9em; display: block; margin-bottom: 6px;">Código:</strong>
+                        <p style="font-size: 1em; color: #333;">{{ boleto.code }}</p>
+                    </div>
+                    {% endif %}
+                    {% if boleto.valor_formatado %}
+                    <div>
+                        <strong style="color: #666; font-size: 0.9em; display: block; margin-bottom: 6px;">Valor:</strong>
+                        <p style="font-size: 1.1em; color: #333; font-weight: 600;">{{ boleto.valor_formatado }}</p>
+                    </div>
+                    {% endif %}
+                    {% if boleto.esta_pago and boleto.data_pagamento %}
+                    <div>
+                        <strong style="color: #666; font-size: 0.9em; display: block; margin-bottom: 6px;">Data de Pagamento:</strong>
+                        <p style="font-size: 1em; color: #28a745; font-weight: 600;">{{ boleto.data_pagamento[:10] if boleto.data_pagamento|length > 10 else boleto.data_pagamento }}</p>
+                    </div>
+                    {% endif %}
+                    {% if boleto.created_at %}
+                    <div>
+                        <strong style="color: #666; font-size: 0.9em; display: block; margin-bottom: 6px;">Criado em:</strong>
+                        <p style="font-size: 1em; color: #666;">{{ boleto.created_at[:19] if boleto.created_at|length > 19 else boleto.created_at }}</p>
+                    </div>
+                    {% endif %}
+                    {% if boleto.updated_at %}
+                    <div>
+                        <strong style="color: #666; font-size: 0.9em; display: block; margin-bottom: 6px;">Atualizado em:</strong>
+                        <p style="font-size: 1em; color: #666;">{{ boleto.updated_at[:19] if boleto.updated_at|length > 19 else boleto.updated_at }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if boleto.descricao %}
+                <div style="padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                    <strong style="color: #666; font-size: 0.9em; display: block; margin-bottom: 8px;">Descrição:</strong>
+                    <p style="font-size: 1.05em; color: #333; line-height: 1.5;">{{ boleto.descricao }}</p>
+                </div>
+                {% endif %}
+                
+                {% if not boleto.esta_pago %}
+                    {% if boleto.url_boleto_pdf %}
+                    <div style="padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                        <strong style="color: #666; font-size: 0.9em; display: block; margin-bottom: 10px;">Download do Boleto:</strong>
+                        <a href="{{ boleto.url_boleto_pdf }}" target="_blank" class="btn btn-pdf" style="text-decoration: none; display: inline-block;">
+                            📄 Baixar Boleto em PDF
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if boleto.linha_digitavel %}
+                    <div style="padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
+                            <strong style="color: #666; font-size: 0.9em;">Linha Digitável:</strong>
+                            <button onclick="copyToClipboard('{{ boleto.linha_digitavel }}')" style="padding: 6px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
+                        </div>
+                        <p style="font-size: 1.05em; color: #333; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 1px; padding: 10px; background: #fafafa; border-radius: 8px; line-height: 1.6; margin: 0;">{{ boleto.linha_digitavel }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if boleto.pix_emv %}
+                    <div style="padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
+                            <strong style="color: #666; font-size: 0.9em;">PIX Copia e Cola:</strong>
+                            <button onclick="copyToClipboard('{{ boleto.pix_emv }}')" style="padding: 6px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
+                        </div>
+                        <p style="font-size: 0.95em; color: #333; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 0.5px; padding: 10px; background: #fafafa; border-radius: 8px; line-height: 1.6; margin: 0;">{{ boleto.pix_emv }}</p>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagamento (apenas se não estiver pago) -->
+    {% if not boleto.esta_pago and boleto.payment_forms %}
+    <div style="margin-top: 30px;">
+        <h3 style="color: #E0367E; margin-bottom: 24px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; font-weight: 700;">💳 Pagamento</h3>
+        <div style="display: flex; flex-direction: column; gap: 30px;">
+            <!-- Código de Barras -->
+            {% if boleto.barcode %}
+            <div class="info-box">
+                <h4 style="color: #333; margin-bottom: 16px; font-size: 1.2em; font-weight: 700;">Código de Barras</h4>
+                <div style="padding: 20px; background: white; border-radius: 12px; border: 2px solid #f0f0f0;">
+                    <div style="font-family: 'Courier New', monospace; font-size: 1.1em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 1px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: text;" onclick="this.select(); document.execCommand('copy');">
+                        {{ boleto.barcode }}
+                    </div>
+                    <button onclick="copyToClipboard('{{ boleto.barcode }}')" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Código de Barras</button>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Linha Digitável -->
+            {% for payment_form in boleto.payment_forms %}
+                {% if payment_form.get('type') == 'BANK_SLIP' and (payment_form.get('digitable_line') or payment_form.get('digitableLine')) %}
+                <div class="info-box">
+                    <h4 style="color: #333; margin-bottom: 16px; font-size: 1.2em; font-weight: 700;">Linha Digitável</h4>
+                    <div style="padding: 20px; background: white; border-radius: 12px; border: 2px solid #f0f0f0;">
+                        <div style="font-family: 'Courier New', monospace; font-size: 1.2em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 2px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: text;" onclick="this.select(); document.execCommand('copy');">
+                            {{ payment_form.digitable_line or payment_form.digitableLine }}
+                        </div>
+                        <button onclick="copyToClipboard('{{ payment_form.digitable_line or payment_form.digitableLine }}')" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Linha Digitável</button>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            <!-- PIX -->
+            {% for payment_form in boleto.payment_forms %}
+                {% if payment_form.get('type') == 'PIX' %}
+                <div class="info-box">
+                    <h4 style="color: #333; margin-bottom: 20px; font-size: 1.2em; font-weight: 700;">PIX</h4>
+                    {% if payment_form.get('qr_code') %}
+                    <div style="margin-bottom: 24px; text-align: center;">
+                        <strong style="display: block; margin-bottom: 12px; font-size: 1em; color: #333; font-weight: 600;">QR Code</strong>
+                        <img src="{{ payment_form.qr_code }}" alt="QR Code PIX" style="max-width: 300px; border: 3px solid #f0f0f0; border-radius: 16px; padding: 20px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    </div>
+                    {% endif %}
+                    {% if payment_form.get('qr_code_text') %}
+                    <div>
+                        <strong style="display: block; margin-bottom: 12px; font-size: 1em; color: #333; font-weight: 600;">PIX Copia e Cola</strong>
+                        <div style="padding: 20px; background: white; border-radius: 12px; border: 2px solid #f0f0f0;">
+                            <div style="font-family: 'Courier New', monospace; font-size: 0.95em; word-break: break-all; text-align: center; color: #333; letter-spacing: 0.5px; padding: 16px; background: #fafafa; border-radius: 8px; line-height: 1.6; cursor: text;" onclick="this.select(); document.execCommand('copy');">
+                                {{ payment_form.qr_code_text }}
+                            </div>
+                            <button onclick="copyToClipboard('{{ payment_form.qr_code_text }}')" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Código PIX</button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <script>
+    function copyToClipboard(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            alert('Copiado para a área de transferência!');
+        } catch (err) {
+            alert('Erro ao copiar. Tente selecionar o texto manualmente.');
+        }
+        document.body.removeChild(textarea);
+    }
+    </script>
+    {% endif %}
+</div>
+{% endblock %}
