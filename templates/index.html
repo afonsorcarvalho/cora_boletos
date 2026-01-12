@@ -20,6 +20,7 @@
                 required
                 autofocus
                 maxlength="18"
+                inputmode="numeric"
             >
         </div>
         
@@ -53,6 +54,52 @@
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    #modal-loading > div {
+        padding: 32px 24px;
+        max-width: 90%;
+    }
+    
+    #modal-loading > div > div:first-child {
+        font-size: 48px;
+        margin-bottom: 20px;
+    }
+    
+    #modal-loading h3 {
+        font-size: 1.2em;
+    }
+    
+    #modal-loading p {
+        font-size: 0.9em;
+    }
+    
+    .info-box ul {
+        padding-left: 20px;
+        font-size: 0.9em;
+    }
+    
+    .info-box p {
+        font-size: 0.9em;
+        line-height: 1.5;
+    }
+}
+
+@media (max-width: 480px) {
+    #modal-loading > div {
+        padding: 24px 16px;
+    }
+    
+    #modal-loading > div > div:first-child {
+        font-size: 40px;
+        margin-bottom: 16px;
+    }
+    
+    #modal-loading h3 {
+        font-size: 1.1em;
+    }
 }
 </style>
 

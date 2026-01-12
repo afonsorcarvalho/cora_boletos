@@ -53,6 +53,63 @@
             margin-bottom: 20px;
         }
         
+        /* Media Queries para Responsividade Mobile */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                margin-bottom: 25px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+                margin-bottom: 8px;
+            }
+            
+            .header p {
+                font-size: 0.95em;
+            }
+            
+            .card {
+                padding: 20px;
+                border-radius: 12px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 12px 24px;
+                font-size: 0.95em;
+            }
+            
+            .form-group input {
+                font-size: 16px; /* Evita zoom no iOS */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .header p {
+                font-size: 0.9em;
+            }
+            
+            .card {
+                padding: 16px;
+            }
+            
+            .info-box {
+                padding: 16px;
+            }
+        }
+        
         .flash-messages {
             margin-bottom: 20px;
         }
@@ -192,6 +249,27 @@
             background-color: #f3f4f6;
             color: #374151;
         }
+        
+        /* Ajustes adicionais para mobile */
+        @media (max-width: 768px) {
+            .flash-message {
+                padding: 12px 16px;
+                font-size: 0.9em;
+            }
+            
+            .info-box h3 {
+                font-size: 1em;
+            }
+            
+            .info-box p {
+                font-size: 0.9em;
+            }
+            
+            .status-badge {
+                font-size: 0.8em;
+                padding: 6px 12px;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -199,7 +277,7 @@
     <div class="container">
         <div class="header">
             <div style="margin-bottom: 25px; display: flex; justify-content: center;">
-                <img src="/static/afr_logo.svg" alt="AFR Logo" style="max-width: 300px; height: auto;" onerror="this.style.display='none'">
+                <img src="/static/afr_logo.svg" alt="AFR Logo" style="max-width: 300px; height: auto; width: 100%; max-width: min(300px, 80vw);" onerror="this.style.display='none'">
             </div>
             <h1>📊 Consulta de Boletos</h1>
             <p>Sistema de consulta de boletos</p>

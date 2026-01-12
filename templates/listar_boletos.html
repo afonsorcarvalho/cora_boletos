@@ -122,13 +122,85 @@
         flex-wrap: wrap;
         margin-top: 10px;
     }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+        .boleto-card {
+            padding: 16px;
+        }
+        
+        .boleto-header {
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        
+        .boleto-dados {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .boleto-dado-valor {
+            font-size: 1em;
+        }
+        
+        .boleto-cliente {
+            font-size: 1em;
+        }
+        
+        .boleto-descricao {
+            font-size: 0.9em;
+        }
+        
+        .card > div:first-child {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .card > div:first-child > div:first-child h2 {
+            font-size: 1.3em;
+        }
+        
+        .card > div:first-child > div:first-child p {
+            font-size: 0.85em;
+        }
+        
+        .btn-secondary {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .status-badge {
+            font-size: 0.75em;
+            padding: 6px 12px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .boleto-card {
+            padding: 12px;
+        }
+        
+        .boleto-dado-label {
+            font-size: 0.8em;
+        }
+        
+        .boleto-dado-valor {
+            font-size: 0.95em;
+        }
+        
+        .card > div:first-child > div:first-child h2 {
+            font-size: 1.1em;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+        <div style="flex: 1; min-width: 200px;">
             <h2 style="color: #E0367E; margin-bottom: 5px; font-weight: 700;">Boletos - {{ dados.cpf }}</h2>
             {% if dados.total_original > 12 %}
             <p style="color: #666666; font-size: 0.9em; margin: 0;">
@@ -140,7 +212,7 @@
             </p>
             {% endif %}
         </div>
-        <a href="{{ url_for('index') }}" class="btn btn-secondary">← Buscar Outro CPF/CNPJ</a>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary" style="flex-shrink: 0;">← Buscar Outro CPF/CNPJ</a>
     </div>
     
     {% if dados.boletos %}
@@ -149,9 +221,11 @@
             <div class="boleto-card" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" 
                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'"
-                 onclick="showLoadingModal(); window.location.href='{{ url_for('visualizar', invoice_id=boleto.id) }}'">
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
-                    <div style="flex: 1;">
+                 onclick="showLoadingModal(); window.location.href='{{ url_for('visualizar', invoice_id=boleto.id) }}'"
+                 ontouchstart="this.style.transform='scale(0.98)'"
+                 ontouchend="this.style.transform='scale(1)'">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 150px;">
                         <div class="boleto-dado-item" style="margin-bottom: 10px;">
                             <span class="boleto-dado-label">Data de Vencimento</span>
                             <span class="boleto-dado-valor" style="font-size: 1.1em;">
@@ -208,6 +282,41 @@
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
+}
+
+@media (max-width: 768px) {
+    #modal-loading-detalhes > div {
+        padding: 32px 24px;
+        max-width: 90%;
+    }
+    
+    #modal-loading-detalhes > div > div:first-child {
+        font-size: 48px;
+        margin-bottom: 20px;
+    }
+    
+    #modal-loading-detalhes h3 {
+        font-size: 1.2em;
+    }
+    
+    #modal-loading-detalhes p {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    #modal-loading-detalhes > div {
+        padding: 24px 16px;
+    }
+    
+    #modal-loading-detalhes > div > div:first-child {
+        font-size: 40px;
+        margin-bottom: 16px;
+    }
+    
+    #modal-loading-detalhes h3 {
+        font-size: 1.1em;
+    }
 }
 </style>
 

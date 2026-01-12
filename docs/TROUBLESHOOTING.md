@@ -594,6 +594,159 @@ def validar_certificados():
         print("⚠️  OpenSSL não encontrado")
 ```
 
+## 🔒 Problemas de SSL/Certbot
+
+### 1. Erro: "Invalid version. The only valid version for X509Req is 0" no Ubuntu 18.04
+
+#### Sintoma
+```
+ValueError: Invalid version. The only valid version for X509Req is 0.
+```
+
+#### Causa
+Este erro ocorre devido a uma incompatibilidade entre versões do Certbot e a biblioteca `pyOpenSSL` no Ubuntu 18.04. O `pyOpenSSL` versão 23.2.0 introduziu validações mais rigorosas que conflitam com versões antigas do Certbot.
+
+#### Solução 1: Atualizar Certbot via Snap (Recomendado)
+
+A forma mais confiável de resolver o problema é instalar o Certbot usando o Snap, que sempre terá a versão mais recente e compatível:
+
+```bash
+# Remover versão antiga do Certbot (se instalada via apt)
+sudo apt remove certbot
+
+# Instalar Certbot via Snap
+sudo snap install --classic certbot
+
+# Criar link simbólico (se necessário)
+sudo ln -sf /snap/bin/certbot /usr/bin/certbot
+
+# Verificar instalação
+certbot --version
+```
+
+**Nota**: O Ubuntu 18.04 usa Python 3.6, que não é mais suportado por versões muito recentes do Certbot. Se encontrar problemas, considere a Solução 2.
+
+#### Solução 2: Fazer Downgrade do pyOpenSSL
+
+Se não puder atualizar o Certbot, faça downgrade do `pyOpenSSL` para uma versão compatível:
+
+```bash
+# Verificar versão atual do pyOpenSSL
+pip3 show pyOpenSSL
+
+# Fazer downgrade para versão compatível
+sudo pip3 install pyOpenSSL==23.1.1
+
+# Verificar se o problema foi resolvido
+certbot --version
+```
+
+#### Solução 3: Usar Certbot via Docker (Alternativa)
+
+Se as soluções acima não funcionarem, você pode usar o Certbot via Docker:
+
+```bash
+# Criar diretório para certificados
+sudo mkdir -p /etc/letsencrypt
+
+# Executar Certbot via Docker
+sudo docker run -it --rm \
+  -v /etc/letsencrypt:/etc/letsencrypt \
+  -v /var/lib/letsencrypt:/var/lib/letsencrypt \
+  -v /tmp/letsencrypt:/var/log/letsencrypt \
+  certbot/certbot certonly --standalone \
+  -d boletos.jgma.com.br
+```
+
+#### Verificação
+
+Após aplicar uma das soluções, teste novamente:
+
+```bash
+# Testar obtenção de certificado (modo teste)
+sudo certbot certonly --standalone --test-cert -d boletos.jgma.com.br
+
+# Se funcionar, obter certificado real
+sudo certbot certonly --standalone -d boletos.jgma.com.br
+```
+
+#### Configuração do Nginx após obter certificado
+
+Após obter o certificado com sucesso, configure o Nginx:
+
+```nginx
+server {
+    listen 80;
+    server_name boletos.jgma.com.br;
+    
+    # Redirecionar HTTP para HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name boletos.jgma.com.br;
+    
+    # Certificados Let's Encrypt
+    ssl_certificate /etc/letsencrypt/live/boletos.jgma.com.br/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/boletos.jgma.com.br/privkey.pem;
+    
+    # Configurações SSL recomendadas
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+    
+    # Proxy para aplicação Flask
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+#### Renovação Automática
+
+Configure renovação automática dos certificados:
+
+```bash
+# Testar renovação
+sudo certbot renew --dry-run
+
+# Adicionar ao crontab para renovação automática
+sudo crontab -e
+
+# Adicionar linha (renova diariamente às 3h da manhã)
+0 3 * * * certbot renew --quiet --deploy-hook "systemctl reload nginx"
+```
+
+#### Prevenção
+
+- **Atualize o sistema**: Considere atualizar para Ubuntu 20.04 ou superior, que tem melhor suporte
+- **Use Snap**: Prefira instalar Certbot via Snap para sempre ter versões atualizadas
+- **Monitore renovação**: Configure alertas para verificar se a renovação automática está funcionando
+
+### 2. Certificado Expirado
+
+#### Sintoma
+```
+SSL certificate problem: certificate has expired
+```
+
+#### Solução
+```bash
+# Renovar certificado manualmente
+sudo certbot renew
+
+# Ou renovar certificado específico
+sudo certbot renew --cert-name boletos.jgma.com.br
+
+# Recarregar Nginx após renovação
+sudo systemctl reload nginx
+```
+
 ## 📞 Suporte
 
 ### Informações para Suporte

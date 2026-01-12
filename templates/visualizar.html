@@ -2,16 +2,135 @@
 
 {% block title %}Boleto {{ boleto.code }} - Consulta de Boletos Cora{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+        .card > div:first-child {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .card > div:first-child h2 {
+            font-size: 1.3em;
+        }
+        
+        .card > div:first-child .btn {
+            width: 100%;
+        }
+        
+        /* Grids responsivos */
+        div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+        }
+        
+        /* Status box */
+        div[style*="background: #f0fdf4"],
+        div[style*="background: #fef3c7"] {
+            padding: 16px !important;
+        }
+        
+        div[style*="background: #f0fdf4"] > div,
+        div[style*="background: #fef3c7"] > div {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 10px !important;
+        }
+        
+        /* QR Code */
+        img[alt="QR Code PIX"] {
+            max-width: 250px !important;
+            width: 100% !important;
+        }
+        
+        /* Botões */
+        button[onclick*="copyToClipboard"] {
+            width: 100% !important;
+            margin-top: 10px !important;
+        }
+        
+        /* Textos longos */
+        p[style*="word-break: break-all"],
+        div[style*="word-break: break-all"] {
+            font-size: 0.85em !important;
+            padding: 12px !important;
+        }
+        
+        /* Data de vencimento destacada */
+        div[style*="background: linear-gradient(135deg"] {
+            padding: 16px !important;
+        }
+        
+        div[style*="background: linear-gradient(135deg"] > div {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 10px !important;
+        }
+        
+        div[style*="background: linear-gradient(135deg"] p {
+            font-size: 1.2em !important;
+        }
+        
+        div[style*="background: linear-gradient(135deg"] div[style*="font-size: 2.5em"] {
+            font-size: 2em !important;
+        }
+        
+        /* Info boxes */
+        .info-box {
+            padding: 16px !important;
+        }
+        
+        .info-box h4 {
+            font-size: 1em !important;
+        }
+        
+        /* Seções */
+        h3 {
+            font-size: 1.2em !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .card > div:first-child h2 {
+            font-size: 1.1em;
+        }
+        
+        img[alt="QR Code PIX"] {
+            max-width: 200px !important;
+        }
+        
+        div[style*="background: linear-gradient(135deg"] p {
+            font-size: 1.1em !important;
+        }
+        
+        p[style*="word-break: break-all"],
+        div[style*="word-break: break-all"] {
+            font-size: 0.8em !important;
+            letter-spacing: 0.5px !important;
+        }
+        
+        h3 {
+            font-size: 1.1em !important;
+        }
+        
+        .info-box h4 {
+            font-size: 0.95em !important;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
         <h2 style="color: #E0367E; font-weight: 700;">Detalhes do Boleto</h2>
-        <a href="javascript:history.back()" class="btn btn-secondary">← Voltar</a>
+        <a href="javascript:history.back()" class="btn btn-secondary" style="flex-shrink: 0;">← Voltar</a>
     </div>
     
     <!-- Status do Pagamento -->
     <div style="margin-bottom: 30px; padding: 24px; background: {% if boleto.esta_pago %}#f0fdf4{% else %}#fef3c7{% endif %}; border-radius: 16px; border-left: 4px solid {% if boleto.esta_pago %}#16a34a{% else %}#f59e0b{% endif %};">
-        <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             <span class="status-badge status-{{ boleto.status.lower() if boleto.status else 'pending' }}">
                 {% if boleto.esta_pago %}
                     ✅ PAGO
@@ -101,11 +220,11 @@
                 {% if boleto.due_date %}
                 <div style="padding: 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; border: 2px solid #f59e0b; margin-bottom: 20px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-                        <div>
+                        <div style="flex: 1; min-width: 200px;">
                             <strong style="color: #92400e; font-size: 0.95em; display: block; margin-bottom: 8px; font-weight: 600;">Data de Vencimento</strong>
                             <p style="font-size: 1.5em; color: #78350f; font-weight: 700; margin: 0;">{{ boleto.due_date[:10] if boleto.due_date|length > 10 else boleto.due_date }}</p>
                         </div>
-                        <div style="font-size: 2.5em;">📅</div>
+                        <div style="font-size: 2.5em; flex-shrink: 0;">📅</div>
                     </div>
                 </div>
                 {% endif %}
@@ -169,8 +288,8 @@
                     {% if boleto.linha_digitavel %}
                     <div style="padding-top: 15px; border-top: 1px solid #e5e7eb;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
-                            <strong style="color: #666; font-size: 0.9em;">Linha Digitável:</strong>
-                            <button onclick="copyToClipboard('{{ boleto.linha_digitavel }}')" style="padding: 6px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
+                            <strong style="color: #666; font-size: 0.9em; flex: 1; min-width: 120px;">Linha Digitável:</strong>
+                            <button onclick="copyToClipboard('{{ boleto.linha_digitavel }}')" style="padding: 8px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s; flex-shrink: 0;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
                         </div>
                         <p style="font-size: 1.05em; color: #333; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 1px; padding: 10px; background: #fafafa; border-radius: 8px; line-height: 1.6; margin: 0;">{{ boleto.linha_digitavel }}</p>
                     </div>
@@ -179,8 +298,8 @@
                     {% if boleto.pix_emv %}
                     <div style="padding-top: 15px; border-top: 1px solid #e5e7eb;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
-                            <strong style="color: #666; font-size: 0.9em;">PIX Copia e Cola:</strong>
-                            <button onclick="copyToClipboard('{{ boleto.pix_emv }}')" style="padding: 6px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
+                            <strong style="color: #666; font-size: 0.9em; flex: 1; min-width: 120px;">PIX Copia e Cola:</strong>
+                            <button onclick="copyToClipboard('{{ boleto.pix_emv }}')" style="padding: 8px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s; flex-shrink: 0;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
                         </div>
                         <p style="font-size: 0.95em; color: #333; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 0.5px; padding: 10px; background: #fafafa; border-radius: 8px; line-height: 1.6; margin: 0;">{{ boleto.pix_emv }}</p>
                     </div>
@@ -200,7 +319,7 @@
             <div class="info-box">
                 <h4 style="color: #333; margin-bottom: 16px; font-size: 1.2em; font-weight: 700;">Código de Barras</h4>
                 <div style="padding: 20px; background: white; border-radius: 12px; border: 2px solid #f0f0f0;">
-                    <div style="font-family: 'Courier New', monospace; font-size: 1.1em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 1px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: text;" onclick="this.select(); document.execCommand('copy');">
+                    <div style="font-family: 'Courier New', monospace; font-size: 1.1em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 1px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: text; overflow-x: auto;" onclick="this.select(); document.execCommand('copy');">
                         {{ boleto.barcode }}
                     </div>
                     <button onclick="copyToClipboard('{{ boleto.barcode }}')" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Código de Barras</button>
@@ -214,7 +333,7 @@
                 <div class="info-box">
                     <h4 style="color: #333; margin-bottom: 16px; font-size: 1.2em; font-weight: 700;">Linha Digitável</h4>
                     <div style="padding: 20px; background: white; border-radius: 12px; border: 2px solid #f0f0f0;">
-                        <div style="font-family: 'Courier New', monospace; font-size: 1.2em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 2px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: text;" onclick="this.select(); document.execCommand('copy');">
+                        <div style="font-family: 'Courier New', monospace; font-size: 1.2em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 2px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: text; overflow-x: auto;" onclick="this.select(); document.execCommand('copy');">
                             {{ payment_form.digitable_line or payment_form.digitableLine }}
                         </div>
                         <button onclick="copyToClipboard('{{ payment_form.digitable_line or payment_form.digitableLine }}')" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Linha Digitável</button>
@@ -231,14 +350,14 @@
                     {% if payment_form.get('qr_code') %}
                     <div style="margin-bottom: 24px; text-align: center;">
                         <strong style="display: block; margin-bottom: 12px; font-size: 1em; color: #333; font-weight: 600;">QR Code</strong>
-                        <img src="{{ payment_form.qr_code }}" alt="QR Code PIX" style="max-width: 300px; border: 3px solid #f0f0f0; border-radius: 16px; padding: 20px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <img src="{{ payment_form.qr_code }}" alt="QR Code PIX" style="max-width: 300px; width: 100%; border: 3px solid #f0f0f0; border-radius: 16px; padding: 20px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                     </div>
                     {% endif %}
                     {% if payment_form.get('qr_code_text') %}
                     <div>
                         <strong style="display: block; margin-bottom: 12px; font-size: 1em; color: #333; font-weight: 600;">PIX Copia e Cola</strong>
                         <div style="padding: 20px; background: white; border-radius: 12px; border: 2px solid #f0f0f0;">
-                            <div style="font-family: 'Courier New', monospace; font-size: 0.95em; word-break: break-all; text-align: center; color: #333; letter-spacing: 0.5px; padding: 16px; background: #fafafa; border-radius: 8px; line-height: 1.6; cursor: text;" onclick="this.select(); document.execCommand('copy');">
+                            <div style="font-family: 'Courier New', monospace; font-size: 0.95em; word-break: break-all; text-align: center; color: #333; letter-spacing: 0.5px; padding: 16px; background: #fafafa; border-radius: 8px; line-height: 1.6; cursor: text; overflow-x: auto;" onclick="this.select(); document.execCommand('copy');">
                                 {{ payment_form.qr_code_text }}
                             </div>
                             <button onclick="copyToClipboard('{{ payment_form.qr_code_text }}')" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Código PIX</button>
