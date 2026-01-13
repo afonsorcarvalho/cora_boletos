@@ -289,9 +289,9 @@
                     <div style="padding-top: 15px; border-top: 1px solid #e5e7eb;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
                             <strong style="color: #666; font-size: 0.9em; flex: 1; min-width: 120px;">Linha Digitável:</strong>
-                            <button onclick="copyToClipboard('{{ boleto.linha_digitavel }}')" style="padding: 8px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s; flex-shrink: 0;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
+                            <button class="btn-copy" data-copy-text="{{ boleto.linha_digitavel }}" style="padding: 8px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s; flex-shrink: 0;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
                         </div>
-                        <p style="font-size: 1.05em; color: #333; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 1px; padding: 10px; background: #fafafa; border-radius: 8px; line-height: 1.6; margin: 0;">{{ boleto.linha_digitavel }}</p>
+                        <p class="copyable-text" data-copy-text="{{ boleto.linha_digitavel }}" style="font-size: 1.05em; color: #333; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 1px; padding: 10px; background: #fafafa; border-radius: 8px; line-height: 1.6; margin: 0; cursor: pointer;" title="Clique para copiar">{{ boleto.linha_digitavel }}</p>
                     </div>
                     {% endif %}
                     
@@ -299,9 +299,9 @@
                     <div style="padding-top: 15px; border-top: 1px solid #e5e7eb;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
                             <strong style="color: #666; font-size: 0.9em; flex: 1; min-width: 120px;">PIX Copia e Cola:</strong>
-                            <button onclick="copyToClipboard('{{ boleto.pix_emv }}')" style="padding: 8px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s; flex-shrink: 0;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
+                            <button class="btn-copy" data-copy-text="{{ boleto.pix_emv }}" style="padding: 8px 16px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s; flex-shrink: 0;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar</button>
                         </div>
-                        <p style="font-size: 0.95em; color: #333; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 0.5px; padding: 10px; background: #fafafa; border-radius: 8px; line-height: 1.6; margin: 0;">{{ boleto.pix_emv }}</p>
+                        <p class="copyable-text" data-copy-text="{{ boleto.pix_emv }}" style="font-size: 0.95em; color: #333; font-family: 'Courier New', monospace; word-break: break-all; letter-spacing: 0.5px; padding: 10px; background: #fafafa; border-radius: 8px; line-height: 1.6; margin: 0; cursor: pointer;" title="Clique para copiar">{{ boleto.pix_emv }}</p>
                     </div>
                     {% endif %}
                 {% endif %}
@@ -319,10 +319,10 @@
             <div class="info-box">
                 <h4 style="color: #333; margin-bottom: 16px; font-size: 1.2em; font-weight: 700;">Código de Barras</h4>
                 <div style="padding: 20px; background: white; border-radius: 12px; border: 2px solid #f0f0f0;">
-                    <div style="font-family: 'Courier New', monospace; font-size: 1.1em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 1px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: text; overflow-x: auto;" onclick="this.select(); document.execCommand('copy');">
+                    <div class="copyable-text" data-copy-text="{{ boleto.barcode }}" style="font-family: 'Courier New', monospace; font-size: 1.1em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 1px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: pointer; overflow-x: auto;" title="Clique para copiar">
                         {{ boleto.barcode }}
                     </div>
-                    <button onclick="copyToClipboard('{{ boleto.barcode }}')" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Código de Barras</button>
+                    <button class="btn-copy" data-copy-text="{{ boleto.barcode }}" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Código de Barras</button>
                 </div>
             </div>
             {% endif %}
@@ -333,10 +333,10 @@
                 <div class="info-box">
                     <h4 style="color: #333; margin-bottom: 16px; font-size: 1.2em; font-weight: 700;">Linha Digitável</h4>
                     <div style="padding: 20px; background: white; border-radius: 12px; border: 2px solid #f0f0f0;">
-                        <div style="font-family: 'Courier New', monospace; font-size: 1.2em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 2px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: text; overflow-x: auto;" onclick="this.select(); document.execCommand('copy');">
+                        <div class="copyable-text" data-copy-text="{{ payment_form.digitable_line or payment_form.digitableLine }}" style="font-family: 'Courier New', monospace; font-size: 1.2em; word-break: break-all; text-align: center; color: #333; font-weight: 600; letter-spacing: 2px; padding: 16px; background: #fafafa; border-radius: 8px; cursor: pointer; overflow-x: auto;" title="Clique para copiar">
                             {{ payment_form.digitable_line or payment_form.digitableLine }}
                         </div>
-                        <button onclick="copyToClipboard('{{ payment_form.digitable_line or payment_form.digitableLine }}')" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Linha Digitável</button>
+                        <button class="btn-copy" data-copy-text="{{ payment_form.digitable_line or payment_form.digitableLine }}" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Linha Digitável</button>
                     </div>
                 </div>
                 {% endif %}
@@ -357,10 +357,10 @@
                     <div>
                         <strong style="display: block; margin-bottom: 12px; font-size: 1em; color: #333; font-weight: 600;">PIX Copia e Cola</strong>
                         <div style="padding: 20px; background: white; border-radius: 12px; border: 2px solid #f0f0f0;">
-                            <div style="font-family: 'Courier New', monospace; font-size: 0.95em; word-break: break-all; text-align: center; color: #333; letter-spacing: 0.5px; padding: 16px; background: #fafafa; border-radius: 8px; line-height: 1.6; cursor: text; overflow-x: auto;" onclick="this.select(); document.execCommand('copy');">
+                            <div class="copyable-text" data-copy-text="{{ payment_form.qr_code_text }}" style="font-family: 'Courier New', monospace; font-size: 0.95em; word-break: break-all; text-align: center; color: #333; letter-spacing: 0.5px; padding: 16px; background: #fafafa; border-radius: 8px; line-height: 1.6; cursor: pointer; overflow-x: auto;" title="Clique para copiar">
                                 {{ payment_form.qr_code_text }}
                             </div>
-                            <button onclick="copyToClipboard('{{ payment_form.qr_code_text }}')" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Código PIX</button>
+                            <button class="btn-copy" data-copy-text="{{ payment_form.qr_code_text }}" style="margin-top: 12px; padding: 10px 20px; background: #E0367E; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; width: 100%; transition: all 0.3s;" onmouseover="this.style.background='#c72d6a'" onmouseout="this.style.background='#E0367E'">Copiar Código PIX</button>
                         </div>
                     </div>
                     {% endif %}
@@ -369,24 +369,151 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
+</div>
+
+<script>
+// Função moderna de copiar para área de transferência com fallback
+async function copyToClipboard(text) {
+    // Tentar usar a API moderna do Clipboard (mais confiável)
+    if (navigator.clipboard && window.isSecureContext) {
+        try {
+            await navigator.clipboard.writeText(text);
+            showCopyFeedback('Copiado para a área de transferência!');
+            return true;
+        } catch (err) {
+            console.error('Erro ao copiar com Clipboard API:', err);
+            // Continuar para o fallback
+        }
+    }
     
-    <script>
-    function copyToClipboard(text) {
+    // Fallback para navegadores antigos ou contextos não seguros
+    try {
         const textarea = document.createElement('textarea');
         textarea.value = text;
         textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
+        textarea.style.left = '-999999px';
+        textarea.style.top = '-999999px';
         document.body.appendChild(textarea);
+        textarea.focus();
         textarea.select();
-        try {
-            document.execCommand('copy');
-            alert('Copiado para a área de transferência!');
-        } catch (err) {
-            alert('Erro ao copiar. Tente selecionar o texto manualmente.');
-        }
+        
+        const successful = document.execCommand('copy');
         document.body.removeChild(textarea);
+        
+        if (successful) {
+            showCopyFeedback('Copiado para a área de transferência!');
+            return true;
+        } else {
+            throw new Error('execCommand retornou false');
+        }
+    } catch (err) {
+        console.error('Erro ao copiar:', err);
+        showCopyFeedback('Erro ao copiar. Tente selecionar o texto manualmente.', true);
+        return false;
     }
-    </script>
-    {% endif %}
-</div>
+}
+
+// Função para mostrar feedback visual ao copiar
+function showCopyFeedback(message, isError = false) {
+    // Criar elemento de feedback
+    const feedback = document.createElement('div');
+    feedback.textContent = message;
+    feedback.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${isError ? '#dc2626' : '#16a34a'};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-weight: 600;
+        font-size: 0.95em;
+        animation: slideIn 0.3s ease-out;
+        max-width: 300px;
+    `;
+    
+    // Adicionar animação CSS se não existir
+    if (!document.getElementById('copy-feedback-style')) {
+        const style = document.createElement('style');
+        style.id = 'copy-feedback-style';
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(feedback);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        feedback.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => {
+            if (feedback.parentNode) {
+                feedback.parentNode.removeChild(feedback);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Adicionar event listeners para todos os botões de copiar quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    // Botões de copiar
+    const copyButtons = document.querySelectorAll('.btn-copy');
+    
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const textToCopy = this.getAttribute('data-copy-text');
+            if (textToCopy) {
+                copyToClipboard(textToCopy);
+            } else {
+                console.error('Texto não encontrado no atributo data-copy-text');
+                showCopyFeedback('Erro: texto não encontrado', true);
+            }
+        });
+    });
+    
+    // Elementos de texto clicáveis para copiar
+    const copyableTexts = document.querySelectorAll('.copyable-text');
+    
+    copyableTexts.forEach(element => {
+        element.addEventListener('click', function() {
+            const textToCopy = this.getAttribute('data-copy-text');
+            if (textToCopy) {
+                // Selecionar o texto visualmente
+                if (window.getSelection) {
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(this);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+                
+                // Copiar usando a função moderna
+                copyToClipboard(textToCopy);
+            }
+        });
+        
+        // Adicionar efeito hover
+        element.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f0f0f0';
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '#fafafa';
+        });
+    });
+});
+</script>
 {% endblock %}
