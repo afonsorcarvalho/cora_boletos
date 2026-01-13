@@ -141,6 +141,10 @@
                         ⚠️ VENCIDO
                     {% elif boleto.status == 'CANCELLED' %}
                         ❌ CANCELADO
+                    {% elif boleto.status == 'OPEN' %}
+                        📋 ABERTO
+                    {% elif boleto.status == 'RECURRENCE_DRAFT' %}
+                        📋 A GERAR
                     {% else %}
                         📋 {{ boleto.status }}
                     {% endif %}
